@@ -11,17 +11,17 @@ Return to the image upload screen with the red exit button on the top righthand 
 The initial screen prompts for file upload. Multiple images can be selected and submitted here. 
 
 ### Annotation
-Select an annotation format in the **Options** in the upper lefthand corner. 
+Select an annotation format in the *Options* in the upper lefthand corner. 
 After completing the annotation on the displayed image, a box will pop up within it's respective category on the left hand side. 
 To delete the annotation, click the red minus button beside the box of the corresponding annotation id. 
 Annotation data is not saved between images - moving on to the next or previous image will delete the current annotations, so they must be downloaded to be preserved.
 
 #### Box/Point Annotation
-Click the *Draw Box or Point* button to start an annotation. Click anywhere on the image to annotate a point.
+Click the **Draw Box or Point** button to start an annotation. Click anywhere on the image to annotate a point.
 Hold down your mouse and drag to annotate a bounding box. The id of these annotations will be visible on the image. 
 
 #### Custom Shape Mask Annotation
-Click the *Draw Custom Shape* button to start an annotation. 
+Click the **Draw Custom Shape** button to start an annotation. 
 Every click made on the image represents the vertices of the desired shape. 
 Line segments will connect the points as they are made. Finish the shape by clicking back on the starting point. 
 Multiple custom shapes can be drawn on one image. The image will yield one mask that includes all of the shapes.
