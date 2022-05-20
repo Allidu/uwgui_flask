@@ -29,6 +29,8 @@ Annotation data is not saved between images - moving on to the next or previous 
 
 ### Running via Terminal
 
+Run the application with:
 ```bash
 python3 app.py
 ```
+Navigate to `localhost:5000` in your browser
