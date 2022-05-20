@@ -12,7 +12,7 @@ The initial screen prompts for file upload. Multiple images can be selected and 
 
 ### Annotation
 Select an annotation format in the *Options* in the upper lefthand corner. 
-After completing the annotation on the displayed image, a box will pop up within it's respective category on the left hand side. 
+After completing the annotation on the displayed image, a box will pop up within it's respective category on the left hand side.  <br/>
 To delete the annotation, click the red minus button beside the box of the corresponding annotation id. 
 Annotation data is not saved between images - moving on to the next or previous image will delete the current annotations, so they must be downloaded to be preserved.
 
