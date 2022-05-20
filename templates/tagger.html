@@ -1,0 +1,546 @@
+<!doctype html>
+<html style="height:100%;">
+<head>
+    <title>Annotate Your Images</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cerulean/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+</head>
+
+<style>
+  .sidebar{
+    width: 25%;
+    height: 100%;
+    float: left;
+    z-index: 10;
+    margin-bottom: 0px;
+  }
+  .content{
+    width: 75%;
+    height: 100%;
+    float: right;
+    z-index: 10;
+    margin-bottom:0px;
+  }
+  .row{
+    padding: 10px 5px;
+    border-bottom: 3px solid black;
+  }
+  .image-name{
+    font-size: 16px;
+  }
+  .counter{
+    border: 2px solid red;
+    border-radius: 50%;
+    font-size: 18px;
+  }
+  .content-image{
+    margin-top:10px;
+  }
+</style>
+
+
+
+<style>
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+  }
+  
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(21px);
+    -ms-transform: translateX(21px);
+    transform: translateX(21px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+  </style>
+  </head>
+  <body>
+
+
+
+<body style="height:100%;">
+  
+  <nav id="sidebar" class="sidebar">
+  <div class="panel-group"> 
+  <div class="panel panel-default" style="height:80%;">
+    
+    <div class=" buttons">
+      <div class="panel-heading">
+        <h3 class="panel-title"><b><center>Options</center></b></h3>
+      </div>
+
+      &nbsp;&nbsp;
+        <input type="button" style="text-align: center;" class="btn btn-primary" onclick="box()" value="Draw Box or Point">
+        &nbsp;&nbsp;
+        <input type="button" style="text-align: center;"  class="btn btn-primary" onclick="custom()" value="Draw Custom Shape">
+        <br><br>&nbsp;&nbsp;
+        <a href="/download" style="width: 140px;" download="annotations.csv" target="_blank">
+          <button class="btn btn-success">Download</button>
+        </a>
+  
+        
+    <!--<input type="button" class="btn btn-primary" onclick="display_overlay()" value="Change Image">-->
+   
+    
+  </div>  
+      
+    </div> 
+
+    <div class="panel panel-default" style="height:50%;">
+      
+      <div class="panel-heading">
+        <h3 class="panel-title"><b><center>Labels</center></b></h3>
+      </div>
+      <script>
+        var label = function(id, name) {
+          window.location.replace("/label/" + id + "?name=" + name);
+        }
+      </script>
+      <div class="panel-body">
+        <div class="list-group">
+          {% for label in labels %}
+            <div class="list-group-item">
+              <div class="input-group">
+                <span class="input-group-addon" id="id">{{ label.id }}</span>
+                {% if label.name %}
+                  <text style="background-color:#E5E7E9;" class="form-control custom-control" style="resize:none">{{ label.name }}</text>
+                {% else %}
+                  <input id= "{{ label.id }}" onkeydown="if (event.keyCode == 13) { label(this.id, this.value); }" type="text" class="form-control" placeholder="Label Name" autofocus></input>
+                {% endif %}
+                  <span class="input-group-btn">
+                  <button id= "{{ label.id }}" class="btn btn-danger" onclick="window.location.replace('/remove/' + this.id)" type="button"><b>-<b></button>
+                </span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>  
+  
+
+  <div class="panel panel-default" style="height:50%;">
+      
+    <div class="panel-heading">
+      <h3 class="panel-title"><b><center>Mask</center></b></h3>
+    </div>
+    <script>
+      var mask = function(id, name) {
+        window.location.replace("/mask/" + id + "?name=" + name);
+      }
+    </script>
+    <div class="panel-body">
+      <div class="list-group">
+        {% for mask in masks %}
+          <div class="list-group-item">
+            <div class="input-group">
+
+              <span class="input-group-addon" id="id">{{ mask.id }}</span>
+                
+              <text style="background-color:#E5E7E9;" class="form-control custom-control" style="resize:none">{{ mask.name }}</text>
+              <!--  
+              {% if mask.name %}
+                  <text style="background-color:#E5E7E9;" class="form-control custom-control" style="resize:none">{{ mask.name }}</text>
+                {% else %}
+                  <input id= "{{ mask.id }}" onkeydown="if (event.keyCode == 13) { mask(this.id, this.value); }" type="text" class="form-control" placeholder="Mask Name" autofocus></input>
+                {% endif %}
+              -->  
+                <span class="input-group-btn">
+                  <button id= "{{ mask.id }}" class="btn btn-danger" onclick="window.location.replace('/removemask/' + this.id)" type="button"><b>-<b></button>
+                </span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>  
+
+</nav>
+<div id="content" class="container content">
+    <div class="row">
+    <span class="counter"><b>{{ head }} / {{ len }}</b></span>
+    <span class="image-name">{{image}}</span>
+    
+    <br>
+    {% if first %}
+      <a class="btn btn-secondary" style="float:left; font-size:19px;" type="button">
+        <span class="glyphicon glyphicon-arrow-left"></span>
+      </a>
+      <a href="/next" class="btn btn-secondary" style="float:left; font-size:19px;" type="button">
+        <span class="glyphicon glyphicon-arrow-right"></span>
+      </a>
+    {% elif not_end %}
+    
+      <a href="/prev" class="btn btn-secondary" style="float:left; font-size:19px;" type="button">
+        <span class="glyphicon glyphicon-arrow-left"></span>
+      </a>
+ 
+      <a href="/next" class="btn btn-secondary" style="float:left; font-size:19px;" type="button">
+        <span class="glyphicon glyphicon-arrow-right"></span>
+      </a>
+    {% else %}
+      
+      <a href="/prev" class="btn btn-secondary" style="float:left; font-size:19px;" type="button">
+        <span class="glyphicon glyphicon-arrow-left"></span>
+      </a>
+  
+      <a class="btn btn-secondary" style="float:left; font-size:19px;" type="button">
+        <span class="glyphicon glyphicon-arrow-right"></span>
+      </a>
+    {% endif %}
+    <p align="right">
+      <a href="/">
+        <button class="btn btn-danger">Exit</button>
+      </a> 
+    </a>
+    &nbsp;&nbsp;&nbsp;
+    </p>
+    </div>
+    <div class="content-image">
+        <canvas id="canvas" style="width:100%; height:100%; margin: 0; padding: 0;"></canvas>
+    </div>
+
+
+    <div class="content-image">
+      <canvas id="canvas" style="width:100%; height:100%; margin: 0; padding: 0;"></canvas>
+  </div>
+ <!-- 
+<style>
+
+  .im {
+    position: absolute;
+    top: 80px;
+    left: 400px;
+    opacity: 0.1;
+    
+  }
+  .over {
+    position: absolute;
+    top: 80px;
+    left: 400px;
+    opacity: 0.5;
+  }
+</style>
+ 
+  <img id="overlay" src= overlay/{{ over_image }} class="over"/>
+  <img id="image" src= image/{{ image }} class="im"/>
+Write your comments here -->
+    <script>
+      
+  
+     
+
+      var labels = {{ labels|tojson|safe }};
+      var masks = {{ masks|tojson }};
+    
+      var c = document.getElementById("canvas");
+      var ctx = c.getContext("2d");
+
+      
+      function display_overlay() {
+        var x = document.getElementById("myDIV");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+      } else {
+        x.style.display = "none";
+      }
+
+      };
+      var drawLabels = function(id, xMin, xMax, yMin, yMax) {
+        ctx.strokeStyle = "red";
+        //ctx.fillStyle = "red";
+        ctx.rect(xMin, yMin, xMax - xMin, yMax - yMin);
+        ctx.lineWidth="4";
+        ctx.stroke();
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "white";
+        ctx.fillText("id: " + id, xMin,yMin-10);
+      };
+
+      var drawMask = function(id, arr) {
+        ctx.strokeStyle = "red";
+        //ctx.fillStyle = "red";
+        for(i = 1; i < arr.length;i = i+1){
+          ctx.beginPath();
+          ctx.moveTo(arr[i-1][0], arr[i-1][1]);
+          ctx.lineTo(arr[i][0], arr[i][1], 6);
+          ctx.strokeStyle = "red";
+          ctx.lineWidth="4";
+          ctx.stroke();
+        }
+          ctx.beginPath();
+          ctx.moveTo(arr[arr.length-1][0], arr[arr.length-1][1]);
+          ctx.lineTo(arr[0][0], arr[0][1], 6);
+          ctx.strokeStyle = "red";
+          ctx.lineWidth="4";
+          ctx.stroke();
+          ctx.font = "30px Arial";
+          ctx.fillStyle = "white";
+          ctx.fillText("mask_id: " + id , arr[0][0], arr[0][1]+10);
+      };
+
+      //load and display image
+      var image = new Image();
+      image.onload = function(e) {
+        ctx.canvas.width = image.width;
+        ctx.canvas.height = image.height;
+        c.width = image.width;
+        c.height = image.height;
+        ctx.drawImage(image, 0, 0);
+        console.log(labels);
+      
+
+        
+        for (i = 0; i < labels.length; i++){
+            drawLabels(labels[i].id, labels[i].xMin, labels[i].xMax, labels[i].yMin, labels[i].yMax);
+        }
+        for (k = masks.length-1; k > -1; k--){
+            drawMask(masks[k].id, masks[k].arr);
+        }
+      };
+  
+      
+      image.style.display="block";
+      image.src = "image/{{ image }}";
+
+      
+    // this flage is true when the user is dragging the mouse
+    var isDown=false;
+    // these vars will hold the starting mouse position
+    var startX, startY, mouseX, mouseY, endX, endY;
+
+    function calcPoints(startX, startY, endX, endY){
+      var temp = 0;
+      if(startX>endX){
+        temp = startX;
+        startX = endX;
+        endX = temp; 
+      }
+      if(startY>endY){
+        temp = startY;
+        startY = endY;
+        endY = temp;
+      }
+      return [startX,startY,endX,endY]
+    }
+    function box(){
+    function handleMouseDown(e){
+      e.preventDefault();
+      e.stopPropagation();
+      // save the starting x/y of the rectangle
+      
+      startX=parseInt((image.width / c.scrollWidth) * e.offsetX);
+      startY=parseInt((image.height / c.scrollHeight) * e.offsetY);
+      // set a flag indicating the drag has begun
+      isDown=true;
+    }
+
+    function handleMouseUp(e){
+      e.preventDefault();
+      e.stopPropagation();
+      // the drag is over, clear the dragging flag
+      if(isDown){
+        endX = parseInt((image.width / c.scrollWidth) * e.offsetX);
+        endY = parseInt((image.height / c.scrollHeight) * e.offsetY);
+        [startX,startY,endX,endY] = calcPoints(startX,startY,endX,endY)
+        window.location.replace("/add/" + (labels.length + 1) +
+              "?xMin=" + startX +
+              "&xMax=" + endX +
+              "&yMin=" + startY +
+              "&yMax=" + endY);
+        isDown=false;
+      }
+    }
+
+    function handleMouseOut(e){
+      e.preventDefault();
+      e.stopPropagation();
+      // the drag is over, clear the dragging flag
+      if(isDown){
+      endX = parseInt((image.width / c.scrollWidth) * e.offsetX);
+      endY = parseInt((image.height / c.scrollHeight) * e.offsetY);
+      [startX,startY,endX,endY] = calcPoints(startX,startY,endX,endY)
+      
+      window.location.replace("/add/" + (labels.length + 1) +
+            "?xMin=" + startX +
+            "&xMax=" + endX +
+            "&yMin=" + startY +
+            "&yMax=" + endY);
+      isDown=false;
+      }
+    }
+
+    function handleMouseMove(e){
+      e.preventDefault();
+      e.stopPropagation();
+      // if we're not dragging, just return
+      if(!isDown){return;}
+      // get the current mouse position
+      mouseX=parseInt((image.width / c.scrollWidth) * e.offsetX);
+      mouseY=parseInt((image.height / c.scrollHeight) * e.offsetY);
+      ctx.strokeStyle = "red";
+      ctx.lineWidth="4";
+      ctx.stroke();
+      // clear the canvas
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(image, 0, 0);
+      // calculate the rectangle width/height based
+      // on starting vs current mouse position
+      var width=mouseX-startX;
+      var height=mouseY-startY;
+
+      // draw a new rect from the start position 
+      // to the current mouse position
+      ctx.strokeRect(startX,startY,width,height);
+    }
+    // listen for mouse events
+    $("#canvas").mousedown(function(e){handleMouseDown(e);});
+    $("#canvas").mousemove(function(e){handleMouseMove(e);});
+    $("#canvas").mouseup(function(e){handleMouseUp(e);});
+    $("#canvas").mouseout(function(e){handleMouseOut(e);});
+  }
+  function custom(){
+    
+    var clicks = 0;
+    var done = false;
+    var lastClick = [0, 0];
+    var startClick = [0, 0];
+    let ptList = [];
+
+document.getElementById('canvas').addEventListener('click', drawLine, false);
+
+function getCursorPosition(e) {
+    var x;
+    var y;
+
+    if (e.pageX != undefined && e.pageY != undefined) {
+        x = e.pageX;
+        y = e.pageY;
+    } else {
+        x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+        y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+    }
+    
+    return [x, y];
+}
+
+function drawLine(e) {
+    ctx = this.getContext('2d');
+    //x = getCursorPosition(e)[0] - this.offsetLeft;
+    
+    x = parseInt((image.width / c.scrollWidth) * e.offsetX);
+    Wid = image.width;
+    //y = getCursorPosition(e)[1] - this.offsetTop;
+   
+    y = parseInt((image.height / c.scrollHeight) * e.offsetY);
+    Hei = image.height;
+    if (clicks == 0) {
+        clicks++;
+        startClick = [x, y];
+        ptList[0] = [x,y];
+        lastClick = [x, y];
+       
+        
+    } 
+    else {
+        ctx.beginPath();
+        ctx.moveTo(lastClick[0], lastClick[1]);
+        
+        clicks++;
+        lastClick = [x, y];
+
+      if(lastClick[0] <= startClick[0]+15 && lastClick[0] >= startClick[0]-15 && 
+      lastClick[1] <= startClick[1]+15 && lastClick[1] >= startClick[1]-15){
+        clicks = 0;
+        x = startClick[0];
+        y = startClick[1];
+        done = true;
+        /*
+        for (i = 0; i < ptList.length; i++)
+          document.writeln((i+1) + ": " + ptList[i]);  
+        */
+        
+      
+      }        
+      else{
+        ptList.push([x,y]);
+
+      }
+      //end of shape
+      
+
+  
+        ctx.lineTo(x, y, 6);
+        ctx.strokeStyle = "red";
+        ctx.lineWidth="4";
+        ctx.stroke();
+        if(done){ 
+          window.location.replace("/addmask/" + (masks.length+1) +
+              "?ptList=" + ptList +
+              "&Hei=" + Hei +
+            "&Wid=" + Wid );
+        }
+    }
+    
+    
+  }
+    
+    
+};
+
+
+
+    </script>
+    
+</div>
+</body>
+</html>
