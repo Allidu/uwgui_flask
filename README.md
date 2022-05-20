@@ -27,4 +27,8 @@ Annotation data is not saved between images - moving on to the next or previous 
 - Line segments will connect the points as they are made. Finish the shape by clicking back on the starting point. 
 - Multiple custom shapes can be drawn on one image. The image will yield one mask that includes all of the shapes.
 
+### Running via Terminal
 
+```bash
+python3 app.py
+```
